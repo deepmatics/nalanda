@@ -24,8 +24,8 @@ merged_df = pd.merge(df, df_answers, on="query_id")
 merged_df = merged_df[merged_df["source"] == "text"].reset_index()
 merged_df = merged_df.drop(["index"], axis = 1)
 
-embedding_model = HuggingFaceEmbeddings(model_name="" )
-llm_model = ""
+embedding_model = HuggingFaceEmbeddings(model_name="/Users/syenwc6b/.cache/huggingface/hub/models--google--embeddinggemma-300m/snapshots/ea082e2d5ef48d95602e8589f0ae7c2799987143" )
+llm_model = "/Users/syenwc6b/.cache/huggingface/hub/models--google--gemma-3-4b-it/snapshots/fb45cab2e2d05204ac7e12f3051d144981d59f41"
 
 llm_pipeline = HuggingFacePipeline.from_model_id(
     model_id=llm_model,

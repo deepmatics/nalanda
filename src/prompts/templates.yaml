@@ -7,15 +7,9 @@ system: |
       Question: 
       {question}
 
-query_transform: |
-      \no_think You are a strict query optimization system. Your sole task is to break down conversational user questions into 2 or 3 concise, individual search questions optimized for vector database retrieval. 
-
-      Example 1:
-      Question: How does Apple's 2025 revenue compare to NVIDIA's?
-      Output:
-      1. What was Apple's revenue in 2025?
-      2. What was NVIDIA's revenue in 2025?
-
-      Example 2:
-      Question: {question}
-      Output:
+multi_query: |
+      You are a strict query optimization system. 
+      Your task is to breakdown user questions into concise, individual search questions optimized for vector database retrieval, if required. 
+      Breakdown the question only based on the content, donot add knowledge. Expand or seperate the question based on complexity. 
+      Generate the output seperated by a semi-colon for each question.
+      Original Question: {question}

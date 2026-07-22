@@ -1,5 +1,5 @@
 from langchain_huggingface import HuggingFaceEmbeddings
-from retreival.embeddings.base import BaseEmbeddingModel
+from retrieval.embeddings.base import BaseEmbeddingModel
 
 class LangchainEmbeddingModel(BaseEmbeddingModel):
     def __init__(self, model_name: str):

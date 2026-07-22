@@ -3,8 +3,7 @@ input_data:
 
 hf:
   embeddings: "google/embeddinggemma-300m"
-  llm_model: "google/gemma-4-12B-it"
-
+  llm_model: "lightning-ai/gpt-oss-20b"
 query_settings:
   use: true  # Set to false to disable query rewriting
   type: "rewrite"  # Expand to "expansion", "hypothetical"
