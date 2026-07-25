@@ -16,6 +16,7 @@ dependencies = [
     "langchain-core>=1.4.8",
     "langchain-huggingface>=1.2.2",
     "langchain-text-splitters>=1.1.2",
+    "litai>=0.0.10",
     "pandas>=3.0.3",
     "pydantic>=2.13.4",
     "rank-bm25>=0.2.2",
@@ -31,4 +32,8 @@ where = ["src"]
 
 [tool.pyright]
 extraPaths = ["src"]
-reportPrivateLocalImportUsage = false
+typeCheckingMode = "basic"
+reportUnknownVariableType = false
+reportUnknownMemberType = false
+reportUnknownArgumentType = false
+reportMissingTypeStubs = false
