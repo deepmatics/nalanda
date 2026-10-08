@@ -1,7 +1,7 @@
 import json
 import os
 import glob
-from ingestion.data_loader.base import BaseDataLoader
+from src.ingestion.data_loader.base import BaseDataLoader
 from langchain_core.documents import Document
 
 class OpenRagBenchJSON(BaseDataLoader):

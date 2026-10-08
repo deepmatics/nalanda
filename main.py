@@ -5,13 +5,14 @@ from tqdm import tqdm
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough
-from src.ingestion.chunking.recursive import LangchainRecursive
-from src.ingestion.data_loader.json_data import OpenRagBenchJSON
+from src.ingestion.splitter.recursive import LangchainRecursive
+from src.ingestion.loader.json_data import OpenRagBenchJSON
 from src.retrieval.embeddings.langchain import LangchainEmbeddingModel
-from src.retrieval.vector_db.chroma import LangchainChroma
+from src.database import LangchainChroma
 from src.utils.config_loader import YamlFile
 from src.llm import LitLLM
-from src.pre_retrieval import transform_query
+from src.query_construction import query_chain, get_unique_union
+from operator import itemgetter
 
 rag_config = YamlFile.load("./config/rag.yaml")
 prompts_template = YamlFile.load("./src/prompts/templates.yaml")
@@ -51,10 +52,25 @@ if __name__ == "__main__":
     run_ingestion(vectorstore, final_splits)
 
     bm25_corpus = [doc.page_content for doc in final_splits]
-
     llm = LitLLM(model_id=LLM_MODEL)
     retriever = vectorstore.retrieve_data(k=3)
+    
+
+    user_query = "In what areas do syllabic embeddings show potential for improvement based on current research findings?"
+    updated_query = query_chain(user_query, llm)
+
+    retrieval_chain = updated_query | retriever.map() | get_unique_union
+
+    docs = retrieval_chain.invoke({"question": user_query})
+    print(f"Total unique documents retrieved: {len(docs)}")
+
     sys_prompt = ChatPromptTemplate.from_template(SYSTEM_PROMPT)
 
-    user_query = "Why is the sky blue?"
-    updated_query = transform_query(user_query, llm)
+    generation_chain = (
+    {"context": retrieval_chain, "question": itemgetter("question")} 
+    | sys_prompt
+    | llm
+    | StrOutputParser()
+    )
+
+    generation_chain.invoke({"question": user_query})

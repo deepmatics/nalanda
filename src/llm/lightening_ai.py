@@ -3,14 +3,15 @@ from langchain_core.messages import AIMessage, AIMessageChunk, BaseMessage
 from langchain_core.outputs import ChatResult, ChatGeneration, ChatGenerationChunk
 from langchain_core.callbacks.manager import CallbackManagerForLLMRun
 from litai import LLM
-from llm.base import BaseLLM
+from src.llm.base import BaseLLM
+import os
 
 class LitLLM(BaseLLM):
     """Encompasses the remote LitAI routing framework for cloud API generations."""
     
     fallback_models: Optional[List[str]] = None
     max_retries: int = 3
-    api_key: str = "54f39405-378d-4329-98b3-fc1d3d87fc74"
+    api_key = os.getenv("LitLLM")
 
     @property
     def client(self) -> LLM:
@@ -29,7 +30,7 @@ class LitLLM(BaseLLM):
 
     @property
     def _llm_type(self) -> str:
-        return "lightning_ai_router"
+        return "lightning_ai"
 
     def _generate(
         self,

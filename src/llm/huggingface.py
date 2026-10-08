@@ -5,14 +5,15 @@ from langchain_core.messages import AIMessage, AIMessageChunk
 from langchain_core.outputs import ChatResult, ChatGeneration, ChatGenerationChunk
 from langchain_core.callbacks.manager import CallbackManagerForLLMRun
 from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline, TextIteratorStreamer
-from llm.base import BaseLLM
+from src.llm.base import BaseLLM
 from langchain_core.messages import AIMessage, AIMessageChunk, BaseMessage
+from src.utils.device import get_device
 
 class HuggingFaceLLM(BaseLLM):
     """Downloads and runs open-source weights directly from Hugging Face."""
     
-    device_map: str = "auto"
-    torch_dtype: str = "float16"
+    device_map = get_device()
+    torch_dtype: str = "bfloat16"
     max_new_tokens: int = 512
 
     @property

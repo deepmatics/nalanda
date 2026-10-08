@@ -1,5 +1,5 @@
 from langchain_chroma import Chroma
-from retrieval.vector_db.base import BaseVectorDB
+from src.retrieval.vector_db.base import BaseVectorDB
 
 class LangchainChroma(BaseVectorDB):
 

@@ -1,1 +1,1 @@
-from .langchain import LangchainEmbeddingModel
+from src.retrieval.embeddings.langchain import LangchainEmbeddingModel
