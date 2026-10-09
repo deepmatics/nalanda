@@ -1,12 +1,14 @@
-input_data: 
-  path: "./data/input/OpenRagBench/pdf/arxiv/corpus/" 
+input_data:
+  provider: "huggingface"
+  dataset: "deepmatics/open_ragbench"
+  data_path: "./data/input/OpenRagBench/" 
 
 hf:
   embeddings: "google/embeddinggemma-300m"
-  llm_model: "lightning-ai/gpt-oss-20b"
+  llm_model: "openai/gpt-5-nano"
 query_settings:
   use: true  # Set to false to disable query rewriting
-  type: "rewrite"  # Expand to "expansion", "hypothetical"
+  type: "rewrite"  # TODO: "expansion", "hypothetical"
 
 chunking:
   size: 500

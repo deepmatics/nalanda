@@ -12,7 +12,7 @@ from src.utils.device import get_device
 class HuggingFaceLLM(BaseLLM):
     """Downloads and runs open-source weights directly from Hugging Face."""
     
-    device_map = get_device()
+    device_map: torch.device = get_device()
     torch_dtype: str = "bfloat16"
     max_new_tokens: int = 512
 

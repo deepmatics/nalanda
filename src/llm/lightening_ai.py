@@ -11,19 +11,18 @@ class LitLLM(BaseLLM):
     
     fallback_models: Optional[List[str]] = None
     max_retries: int = 3
-    api_key = os.getenv("LitLLM")
+    api_key: str | None = os.getenv("LitLLM")
 
     @property
     def client(self) -> LLM:
         """Lazy-loads the LitAI routing client engine."""
         if not hasattr(self, "_client_instance"):
-            full_model_name = f"lightning-ai/{self.model_id}" if not self.model_id.startswith("lightning-ai/") else self.model_id
+            full_model_name: Any = self.model_id
             
             self._client_instance = LLM(
-                # cast full_model_name to Any to satisfy Pyright's strict literal matching
-                model=cast(Any, full_model_name),
-                fallback_models=self.fallback_models,
-                max_retries=self.max_retries,
+                model= full_model_name,
+                fallback_models= self.fallback_models,
+                max_retries= self.max_retries,
                 api_key = self.api_key
             )
         return self._client_instance

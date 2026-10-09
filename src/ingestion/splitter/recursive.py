@@ -1,6 +1,6 @@
 from typing import List
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from src.ingestion.chunking.base import BaseChunker
+from src.ingestion.splitter.base import BaseChunker
 
 class LangchainRecursive(BaseChunker):
     def __init__(self, chunk_config: dict):
