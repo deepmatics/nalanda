@@ -1,47 +1,47 @@
 import pandas as pd
 from langchain_chroma import Chroma
-from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 from langchain_huggingface import ChatHuggingFace, HuggingFacePipeline
+from src.retrieval.embeddings.langchain import LangchainEmbeddingModel
 from tqdm import tqdm
 from flow_judge import Hf, FlowJudge, EvalInput, list_all_metrics
 from flow_judge.metrics import RESPONSE_FAITHFULNESS_5POINT, RESPONSE_CORRECTNESS_5POINT, RESPONSE_RELEVANCE_5POINT
-import chromadb
-from chromadb.config import Settings
+from src.utils.config_loader import YamlFile
+from src.llm import LitLLM
+
+rag_config = YamlFile.load("./config/rag.yaml")
+prompts_template = YamlFile.load("./src/prompts/templates.yaml")
+
+INPUT_DATA_PATH =  rag_config["input_data"]["data_path"] + "pdf/arxiv/corpus/"
+EMBEDDING_MODEL = rag_config["hf"]["embeddings"]
+LLM_MODEL = rag_config["hf"]["llm_model"] 
 
 # Preparing the benchmark dataset
-df = pd.read_json("data/input/OpenRagbench/pdf/arxiv/queries.json", orient="index")
+df = pd.read_json("data/input/OpenRAGBench/pdf/arxiv/queries.json", orient="index")
 df = df.reset_index().rename(columns={"index": "query_id"})
 
-df_answers = pd.read_json("data/input/OpenRagBench/pdf/arxiv/answers.json", orient="index")
+df_answers = pd.read_json("data/input/OpenRAGBench/pdf/arxiv/answers.json", orient="index")
 df_answers = df_answers.reset_index().rename(columns={"index": "query_id", 0: "answers"})
-df_sec_id = pd.read_json("data/input/OpenRagBench/pdf/arxiv/qrels.json", orient="index")
+df_sec_id = pd.read_json("data/input/OpenRAGBench/pdf/arxiv/qrels.json", orient="index")
 df_sec_id = df_sec_id.reset_index().rename(columns={"index": "query_id", "section_id": "answer_section"})
 
 merged_df = pd.merge(df, df_answers, on="query_id")
 merged_df = merged_df[merged_df["source"] == "text"].reset_index()
 merged_df = merged_df.drop(["index"], axis = 1)
 
-embedding_model = HuggingFaceEmbeddings(model_name="/Users/syenwc6b/.cache/huggingface/hub/models--google--embeddinggemma-300m/snapshots/ea082e2d5ef48d95602e8589f0ae7c2799987143" )
-llm_model = "/Users/syenwc6b/.cache/huggingface/hub/models--google--gemma-3-4b-it/snapshots/fb45cab2e2d05204ac7e12f3051d144981d59f41"
-
-llm_pipeline = HuggingFacePipeline.from_model_id(
-    model_id=llm_model,
-    task="text-generation" # ,
-    #pipeline_kwargs={"max_new_tokens": 512, "temperature": 0.1}
-)
-llm = ChatHuggingFace(llm=llm_pipeline)
+embedding = LangchainEmbeddingModel(model_name=EMBEDDING_MODEL)
+llm = LitLLM(model_id=LLM_MODEL)
 
 def format_docs(docs):
     return " \n\n ".join(doc.page_content for doc in docs)
 
-client = chromadb.Client(Settings(anonymized_telemetry=False))
-vectorstore = Chroma(
-    embedding_function=embedding_model,
-    persist_directory="./chroma_db/OpenRagBench"
-)
+# client = chromadb.Client(Settings(anonymized_telemetry=False))
+# vectorstore = Chroma(
+#     embedding_function=embedding_model,
+#     persist_directory="./chroma_db/OpenRagBench"
+# )
 
 template = """
 Using the information contained in the context, give a comprehensive answer to the question.
@@ -57,9 +57,6 @@ Question: {question}
 """
 
 prompt = ChatPromptTemplate.from_template(template)
-
-def format_docs(docs):
-    return "\n\n".join(doc.page_content for doc in docs)
 
 def get_rag_response(row):
 

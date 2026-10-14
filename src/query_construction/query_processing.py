@@ -1,4 +1,5 @@
 import re
+from langchain_core.documents import Document
 from langchain_core.load import dumps, loads
 from typing import Any, List, Dict, cast
 from langchain_core.prompts import ChatPromptTemplate
@@ -55,4 +56,4 @@ def get_unique_union(documents: list[list]):
     """A simple function to get the unique union of retrieved documents"""
     flattened_docs = [dumps(doc) for sublist in documents for doc in sublist]
     unique_docs = list(set(flattened_docs))
-    return [loads(doc) for doc in unique_docs]
+    return [loads(doc, allowed_objects=[Document]) for doc in unique_docs]
